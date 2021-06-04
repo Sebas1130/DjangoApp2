@@ -1,0 +1,218 @@
+Requisitos del Proyecto 
+
+TABLA DE CONTENIDO 
+Contenido:
+
+●Arquitectura de una aplicación
+●Buenas prácticas (The twelve-factor app)
+●Codebase setup
+●Diseño de un API REST
+●Modelos avanzados
+●Django REST Framework
+●Autenticación y permisos
+●Vistas avanzadas
+●Test-driven development
+●Tareas administrativas
+●Tareas asíncronas y calendarizadas con celery
+●Deployment
+
+se divide en Tres Partes Principales 
+
+*INVITACION : Un usuario se une a un grupo a traves de una invitacion .Cada usuario tiene Un
+numero limitado de invitaviones dentro de cada grupo 
+
+
+*RIDE : Dentro del grupo un mienbro puede ofrecer o sumarse a un viaje. Solo un numero definido 
+de usuarios se pueden sumar a un viaje 
+
+
+*CALIFICACION : Al finalizar el viaje los usuarios califican su experiencia. Cada usuarios tiene
+una reputacion gerenal y es publica a traves de todos sus circulos 
+
+Va Asi EJEMPLO 
+
+CLASE USUARIO 
+BASE
+
+
+base                            Perfil                            Miembros                
+*Email                          *User (PK)                         *User(PK) / Profile(PK)
+*Username                       *Picture                           *circulo(PK)
+*Phone Number                   *biography(about me)               *¿Es administrador del circulo (BOOL)?
+*first name                     *Rides tomados(total)              *Invitaciones (usadas/restantes)
+*last name                      *Rides Ofrecidos(total)            *¿Quien lo invito ?
+*                                                                  *Rides tomados(dentro del circulo)
+*                                                                  *Rides Ofrecidos(dentro del circulo)
+
+EJEMPLO 2 
+Círculos  (Grupos)
+
+
+Círculo:                                            Invitación:                                   
+*Nombre                                             *Código
+*Slug name                                          *Círculo (PK)
+*About                                              *¿Quién invita?
+*Picture                                            *¿Quién la usó?
+*Miembros                                           *¿Cuándo se usó?
+*Rides tomados
+*Rides ofrecidos
+*¿Es un círculo oficial?
+*¿Es público?
+*¿Tiene límite de miembros? ¿Cuál es?
+
+
+EJEMPLO 3 
+RIDES
+
+Ride:                                                       Calificación:
+*¿Quién lo ofreció?                                         *Ride (PK)
+*¿Dónde se ofreció? (círculo)                               *Círculo (PK)
+*¿Cuándo? ¿Dónde?                                           *¿Quién califica?
+*Asientos disponibles                                       *¿A quién califica?
+*Comentarios adicionales                                    *Calificación (1-5)
+*Calificación (promedio)
+*¿Sigue activo?
+
+NODO 2 CIMIENTOS
+
+●Arquitectura de una Aplicacion 
+    El objetivo de este curso es convertirte en un Backend profesional que usa Django como su herramienta profesional.
+
+El Backend consiste en todo lo que no puede ver el usuario :
+
+    *Montar el servidor
+    *Montar el Aplicativo 
+    *Comunicarse con la base de datos para las consultas
+
+Un Backend developer es un diseñador , su trabajo consiste un 90% en leer , diseñar , analzar y planear. 
+Un 10% en programar .Nuestro trabajo mas importante es el diseño del sistema y las decisiones tomadasson 
+mas costosas y mas dificiles de cambiar  
+
+Hay diferentes tipos de arquitecturas :
+
+*Monolitica
+*Distribuida
+*Hibrida
+*Orientada a Servicios(o en sus signas en ingles 'SOA' )
+
+Monolitica
+Una aplicación monolítica tiene todas o la mayoría de sus funcionalidades en un único proceso o contenedor 
+y está formada por capas internas o bibliotecas. El inconveniente de este enfoque aparece cuando la aplicación 
+aumenta y debe escalarse. Si se escala toda la aplicación, realmente no es un problema. Aun así, en la mayoría 
+de los casos, solo unos pocos elementos de la aplicación son los puntos de obstrucción que deben escalarse, 
+mientras que otros componentes se usan menos.
+
+Distribuida
+Una aplicación con distintos componentes que se ejecutan en entornos separados, normalmente en diferentes 
+plataformas conectadas a través de una red. Las típicas aplicaciones distribuidas son de dos niveles (cliente-servidor),
+tres niveles (cliente-middleware-servidor) y multinivel. 
+
+
+Hibrida
+Las aplicaciones móviles híbridas son una combinación de tecnologías web como HTML, CSS y JavaScript, que no son
+ni aplicaciones móviles verdaderamente nativas, porque consisten en un WebView ejecutado dentro de un contenedor 
+nativo, ni tampoco están basadas en Web, porque se empaquetan como aplicaciones para distribución y tienen acceso 
+a las APIs nativas del dispositivo.
+
+
+Orientada a servicios
+Web Services es la manera en que se implementan las arquitecturas orientadas a servicios, se crean bloques 
+que son accesibles a través de la web, son independientes del lenguaje de programación.
+
+    SOAP: Tiene su propio estándar, conocido por utilizar XML.
+
+    REST: Representational State Transfer, el objetivo es que nuestras operaciones sean Stateless. 
+          REST depende mucho más del protocolo HTTP.
+
+    GraphQL: Es el más moderno, desarrollado por Facebook. Funciona más como un Query Language para 
+             las API, un lenguaje de consultas.
+
+
+●Buenas prácticas (The twelve-factor app)
+puede encontrar mas en https://12factor.net/admin-processes
+
+LA APLICACION DE DOCE FACTORES 
+En la era moderna, el software se entrega comúnmente como un servicio: llamadas aplicaciones web o 
+software como servicio .
+
+La aplicación de doce factores es una metodología para crear aplicaciones de software como servicio que:
+
+	*Utilice formatos declarativos para la automatización de la configuración, para minimizar el tiempo y el costo de los 		 
+    nuevos  desarrolladores que se unen al proyecto;
+
+
+	*Tener un contrato limpio con el sistema operativo subyacente, ofreciendo máxima portabilidad entre entornos de 		 
+    ejecución;
+
+
+	*Son adecuados para su implementación en plataformas en la nube modernas , lo que evita la necesidad de 		  	   
+    administración de servidores y sistemas;
+
+
+	*Minimizar la divergencia entre el desarrollo y la producción, permitiendo el despliegue continuo para una máxima 		 
+    agilidad;
+
+	*Y puede escalar sin cambios significativos en las herramientas, la arquitectura o las prácticas de desarrollo.
+
+
+La metodología de doce factores se puede aplicar a aplicaciones escritas en cualquier lenguaje de programación y que utilizan 
+cualquier combinación de servicios de respaldo (base de datos, cola, caché de memoria, etc.).
+
+EJEMPLOS:
+
+*Codebase: 
+Se refiere a que nuestra app siempre debe estar trackeada por un sistema de control de versiones como 
+Git,Mercurial, etc. Una sola fuente de verdad.
+
+*Dependencias: 
+Una 12 factor app nunca debe depender de la existencia implícita de nuestro OS, siempre se declaran
+explícitamente qué dependencias usa el proyecto y se encarga de que estas no se filtren. Dependency Isolation.
+
+*Configuración: 
+Acá nos referimos a algo que va a cambiar durante entornos.
+
+*Backing services: 
+Estos pueden ser conectados y desconectados a voluntad. Es cualquier servicio que nuestra aplicación
+puede consumir a través de la red como Base de Datos, Mensajería y Cola, Envío de Emails o Caché.
+
+*Build, release, run: 
+Separa estrictamente las etapas de construcción y las de ejecución. Build es convertir nuestro código 		       
+fuente en un paquete.Release es la etapa donde agregamos a nuestro paquete cosas de configuración como 			       
+variables de entorno y Run donde corremos la aplicación en el entorno correspondiente. Las etapas no 		       
+se pueden mezclar.
+
+*Procesos: 
+En el caso más complejo tenemos muchos procesos corriendo como Celery y Redis, en esta parte los 			      
+procesos son stateless y no comparten nada. Cualquier dato que necesite persistir en memoria o en 			       
+disco duro tiene que almacenarse en un backing services,
+
+*Dev/prod parity: 
+Reducir la diferencia entre entornos para reducir tiempo entre deploys y las personas involucradas sean 			       
+las mismas que puedan hacer el deploy
+
+*Admin processes: 
+Tratar los procesos administrativos como una cosa diferente, no deben estar con la app.
+
+*Enlace de puerto: 
+En un entorno de desarrollo local, el desarrollador visita una URL de servicio como
+http://localhost5000/ para acceder al servicio exportado por su aplicación. En la implementación, una 
+capa de enrutamiento maneja las solicitudes de enrutamiento desde un nombre de host público a los 			       
+procesos web vinculados al puerto.
+Tenga en cuenta también que el enfoque de enlace de puertos significa que una aplicación puede 
+convertirse en el servicio de respaldo para otra aplicación, proporcionando la URL a la aplicación de 			       
+respaldo como un identificador de recursos en la configuración de la aplicación consumidora.
+
+
+*Desechabilidad:
+Los procesos de la aplicación de doce factores son desechables , lo que significa que se pueden iniciar o 
+detener en cualquier momento. Esto facilita el escalado elástico rápido, la implementación rápida de cambios 
+de código o configuración y la solidez de las implementaciones de producción.
+			
+*Registros:
+Los registros proporcionan visibilidad del comportamiento de una aplicación en ejecución. En entornos basados ​​
+en servidor, normalmente se escriben en un archivo en el disco (un "archivo de registro"); pero este es solo un 
+formato de salida.
+Una aplicación de doce factores nunca se preocupa por el enrutamiento o el almacenamiento de su flujo de salida. 
+No debe intentar escribir o administrar archivos de registro. En su lugar, cada proceso en ejecución escribe su 
+flujo de eventos, sin búfer, en stdout. Durante el desarrollo local, el desarrollador verá este flujo en el primer 
+plano de su terminal para observar el comportamiento de la aplicación.
